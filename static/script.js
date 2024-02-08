@@ -24,52 +24,79 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    const apiDetailsButton = document.getElementById('api-details-button'); // 올바른 id로 수정
+    const apiDetailsButton = document.getElementById('apiDetailsButton'); // 올바른 id로 수정
     if (apiDetailsButton) {
         apiDetailsButton.addEventListener('click', function() {
             fetchDetailedData('/api-results-detail', 'api-results-detail');
-            toggleDisplay('api-results-detail');
+            // toggleDisplay('api-results-detail');
         });
     }
 
-    // const apiDetailsButton = document.getElementById('api-details-button');
-    // if (apiDetailsButton) {
-    //     apiDetailsButton.addEventListener('click', function() {
-    //         fetchDetailedData('/api-results-detail', 'api-results-detail');
-    //         toggleDisplay('api-results-detail');
-    //     });
-    // }
-
-    const crawlingdetailsbutton = document.getElementById('crawling-details-button');
-    if (crawlingdetailsbutton) {
-        crawlingdetailsbutton.addEventListener('click', function() {
+    const crawlingdetailsButton = document.getElementById('crawlingdetailsButton');
+    if (crawlingdetailsButton) {
+        crawlingdetailsButton.addEventListener('click', function() {
             fetchDetailedData('/crawling-results-detail', 'crawling-results-detail');
-            toggleDisplay('crawling-results-detail');
+            // toggleDisplay('crawling-results-detail');
         });
+    }
+
+    function loadHomeContent() {
+        const today = new Date().toISOString().slice(0, 10); // 오늘 날짜를 YYYY-MM-DD 형식으로 변환
+        fetch(`/api-check-status?date=${today}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버로부터 데이터를 가져오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateHomeTab(data); // 데이터를 기반으로 홈 탭 내용 업데이트
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('Home').innerHTML = '데이터를 불러오는 데 실패했습니다.';
+            });
+    }
+
+    function updateHomeTab(data) {
+        const homeTab = document.getElementById('Home');
+        let content = '';
+    
+        data.forEach(item => {
+            // 점검 결과에 따라 클래스 이름 결정 (예: 'status-ok', 'status-error')
+            const statusClass = item.status === '정상' ? 'status-ok' : 'status-error';
+            // 항목별로 내용 추가 (예시입니다. 실제 데이터 구조에 맞게 조정해야 합니다.)
+            content += `<div class="${statusClass}">${item.checkName}: ${item.status}</div>`;
+        });
+    
+        homeTab.innerHTML = content;
     }
 
     // 홈 탭에 현재 날짜 데이터 점검 결과 표시
-    // displayTodaysCheckStatus();
-
-    // const crawlingDetailsButton = document.getElementById('crawling-details-button');
-    // if (crawlingDetailsButton) {
-    //     crawlingDetailsButton.addEventListener('click', function() {
-    //         fetchDetailedData('/crawling-results-detail', 'crawling-results-detail');
-    //         toggleDisplay('crawling-results-detail');
-    //     });
-    // }
-
-    // const checkStatus = document.getElementById('checkStatus');
-    // // 데이터 점검 결과가 정상인지 확인하는 논리값, 실제로는 데이터 점검 로직에 따라 결정되어야 함
-    // const isDataStatusOk = true; // 이 부분을 실제 데이터 점검 결과에 따라 설정
-    
-    // if (isDataStatusOk) {
-    //     checkStatus.classList.add('status-ok');
-    //     checkStatus.classList.remove('status-error');
-    // } else {
-    //     checkStatus.classList.remove('status-ok');
-    //     checkStatus.classList.add('status-error');
-    // }    
+    function displayTodaysCheckStatus() {
+        const today = new Date().toISOString().slice(0, 10);
+        // 서버로부터 현재 날짜의 데이터 점검 상태를 가져오기 위한 요청
+        // 이 부분은 올바른 API 엔드포인트 URL로 수정해야 함
+        fetch(`/correct-api-endpoint?date=${today}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`서버 오류: 상태 코드 ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const homeTabContent = document.getElementById('Home');
+                // 데이터 점검 결과에 따라 내용 업데이트
+                // 서버 응답 구조에 따라 data.status를 적절히 수정
+                homeTabContent.innerHTML = `오늘의 데이터 점검 상태: ${data.status}`;
+            })
+            .catch(error => {
+                console.error('Error fetching today\'s check status:', error);
+                // 오류 처리 로직 추가, 예를 들어 사용자에게 오류 메시지를 표시
+                const homeTabContent = document.getElementById('Home');
+                homeTabContent.innerHTML = `데이터 점검 상태를 불러오는 데 실패했습니다.`;
+            });
+    }
 
     function fetchDataAndVisualize(apiEndpoint, resultContainerId) {
         fetch(apiEndpoint)
@@ -193,13 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function fetchDetailedData(apiEndpoint, resultContainerId) {
         fetch(apiEndpoint)
-            .then(response => {
-                // 서버 응답의 상태 코드 확인
-                if (!response.ok) {
-                    throw new Error(`서버 오류: 상태 코드 ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
     
                 const resultsContainer = document.getElementById(resultContainerId);
@@ -242,32 +263,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
     
-    // 홈 탭에 현재 날짜 데이터 점검 결과 표시
-    function displayTodaysCheckStatus() {
-        const today = new Date().toISOString().slice(0, 10);
-        // 서버로부터 현재 날짜의 데이터 점검 상태를 가져오기 위한 요청
-        // 이 부분은 올바른 API 엔드포인트 URL로 수정해야 함
-        fetch(`/correct-api-endpoint?date=${today}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`서버 오류: 상태 코드 ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const homeTabContent = document.getElementById('Home');
-                // 데이터 점검 결과에 따라 내용 업데이트
-                // 서버 응답 구조에 따라 data.status를 적절히 수정
-                homeTabContent.innerHTML = `오늘의 데이터 점검 상태: ${data.status}`;
-            })
-            .catch(error => {
-                console.error('Error fetching today\'s check status:', error);
-                // 오류 처리 로직 추가, 예를 들어 사용자에게 오류 메시지를 표시
-                const homeTabContent = document.getElementById('Home');
-                homeTabContent.innerHTML = `데이터 점검 상태를 불러오는 데 실패했습니다.`;
-            });
-    }
-    
     function openTab(evt, tabName) {
         var tabcontent = document.getElementsByClassName("tabcontent");
         var tablinks = document.getElementsByClassName("tablinks");
@@ -287,8 +282,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         evt.currentTarget.className += " active";
     }
+
     // 이벤트 리스너를 적절한 탭 버튼에 추가
-    document.getElementById('defaultOpen').click(); // 페이지 로딩 시 기본 탭 활성화
-
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById("defaultOpen").click();
+    });
 });
-

@@ -99,8 +99,8 @@ h2 {
     padding: 14px 16px;
     transition: 0.3s;
     font-size: 17px;
-    width: 100%; /* 버튼의 너비를 조정하여 전체 너비를 차지하도록 함 */
-    text-align: left; /* 텍스트를 왼쪽 정렬 */
+    width: 90%; /* 버튼의 너비를 조정하여 전체 너비를 차지하도록 함 */
+    text-align: center; /* 텍스트를 왼쪽 정렬 */
 }
 
 .tab button:hover {
@@ -118,7 +118,7 @@ h2 {
 /* 스크롤 컨테이너 스타일 */
 .scroll-container {
     overflow-x: auto; /* 가로 스크롤 활성화 */
-    width: 90%; /* 컨테이너의 너비를 설정 */
+    width: 70%; /* 컨테이너의 너비를 설정 */
 }
 
 /* 테이블 스타일 */
@@ -126,8 +126,6 @@ h2 {
     min-width: 650px; /* 최소 가로 너비 설정 */
     max-width: 1200px; /* 최대 가로 너비 설정 */
 }
-
-
 
 .middle-container {
     width: 80%;
@@ -197,11 +195,22 @@ table {
 }
 
 .status-ok {
-    background-color: green;
     color: white;
+    background-color: green;
+    padding: 20px;
+    margin: 10px 0;
 }
   
 .status-error {
-background-color: red;
-color: white;
+    color: white;
+    background-color: red;
+    padding: 20px;
+    margin: 10px 0;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    min-width: 100px; /* 셀의 최소 너비를 지정 */
 }
