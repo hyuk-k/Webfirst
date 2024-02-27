@@ -1,5 +1,4 @@
 /* css 파일에는 웹사이트 스타일 정의 */
-
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -7,46 +6,29 @@ body {
     background: #f4f4f4;
 }
 
-.intro-container {
+/* 공통 컨테이너 스타일 */
+.container {
     margin: 20px;
     padding: 20px;
-    background-color: #f5f5f5; /* 배경색 */
-    border-radius: 10px; /* 모서리 둥글게 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.intro-container h1 {
-    color: #333; /* 제목 색상 */
-    text-align: center; /* 텍스트 가운데 정렬 */
-}
-
-.intro-container p {
-    color: #666; /* 문단 색상 */
-    line-height: 1.6; /* 줄 간격 */
-    text-align: justify; /* 양쪽 정렬 */
-}
-
-
-h1 {
+.container h1, h2, p {
     color: #333;
+    text-align: left;
 }
 
-p {
-    font-size: 18px;
+.container p {
     color: #666;
+    line-height: 1.6;
+    text-align: justify;
 }
-
-h2 {
-    color: #333;
-    padding-top: 40px;
-    /* margin-top: 20px; */
-}
-
 
 .top-container {
     width: 100%;
     background: #fff;
-    color: #333;
     padding: 20px;
     text-align: center;
     position: fixed;
@@ -56,16 +38,14 @@ h2 {
 
 .main-container {
     display: flex;
-    /* display: none; */
     margin-top: 20px;
-    margin-left: 320px; /* 사이드바 너비 + 여백 */
-    padding-top: 160px; /* 상단 컨테이너 높이 */
+    margin-left: 320px;
+    padding-top: 160px;
 }
 
-/* styles.css */
 .sidebar {
     position: fixed;
-    top: 60px; /* 상단 컨테이너 아래에 위치하도록 조정 */
+    top: 100px;
     left: 0;
     width: 250px;
     height: 100%;
@@ -77,9 +57,9 @@ h2 {
 .sidebar .tab button {
     display: block;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    background-color: #4CAF50;
+    padding: 9px;
+    margin-bottom: 9px;
+    background-color: #56ad59;
     color: white;
     border: none;
     text-align: left;
@@ -87,23 +67,7 @@ h2 {
     transition: 0.3s;
 }
 
-.sidebar .tab button:hover {
-    background-color: #45a049;
-}
-
-.tab button {
-    background-color: inherit;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-    font-size: 17px;
-    width: 90%; /* 버튼의 너비를 조정하여 전체 너비를 차지하도록 함 */
-    text-align: center; /* 텍스트를 왼쪽 정렬 */
-}
-
-.tab button:hover {
+.sidebar .tab button:hover, .tab button:hover {
     background-color: #ddd;
 }
 
@@ -114,11 +78,10 @@ h2 {
     border-top: none;
 }
 
-
-/* 스크롤 컨테이너 스타일 */
+/* 스크롤 컨테이너 및 테이블 스타일 */
 .scroll-container {
-    overflow-x: auto; /* 가로 스크롤 활성화 */
-    width: 70%; /* 컨테이너의 너비를 설정 */
+    overflow-x: auto;
+    width: 90%;
 }
 
 /* 테이블 스타일 */
@@ -139,45 +102,6 @@ h2 {
     /* 추가적인 스타일링 */
 }
 
-
-/* styles.css */
-
-table {
-    width: 90%;
-    border-collapse: collapse;
-    text-align: center; /* 셀 내용을 중앙에 배치 */
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-    min-width: 100px; /* 셀의 최소 너비를 지정 */
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-/* 정상 상태를 나타내는 셀에 대한 스타일 */
-.normal {
-    background-color: #dff0d8; /* 연한 녹색 */
-}
-
-/* 오류 상태를 나타내는 셀에 대한 스타일 */
-.error {
-    background-color: #f2dede; /* 연한 적색 */
-}
-
-.table-container {
-    overflow-x: auto;
-    display: flex;
-}
-
 /* 고정된 열을 위한 테이블 */
 .fixed-column {
     /* 고정 열 스타일 */
@@ -192,25 +116,26 @@ tr:nth-child(even) {
 table {
     width: 100%;
     border-collapse: collapse;
-}
-
-.status-ok {
-    color: white;
-    background-color: green;
-    padding: 20px;
-    margin: 10px 0;
-}
-  
-.status-error {
-    color: white;
-    background-color: red;
-    padding: 20px;
-    margin: 10px 0;
+    text-align: center;
 }
 
 th, td {
     border: 1px solid #ddd;
     padding: 8px;
-    text-align: center;
-    min-width: 100px; /* 셀의 최소 너비를 지정 */
+    min-width: 100px;
+    background-color: #f2f2f2;
+}
+
+.status-normal, .status-error {
+    padding: 20px;
+    color: white;
+    margin: 10px 0;
+}
+
+.status-normal {
+    background-color: green;
+}
+  
+.status-error {
+    background-color: red;
 }

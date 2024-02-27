@@ -31,9 +31,12 @@
         <div id="Home" class="tabcontent" style="display:none;">
 
             <h1>경기도자율주행센터</h1>
-            <p>일일 점검 결과</p>
-                        <!-- 여기에 오늘 날짜의 데이터 점검 상황을 표시할 내용을 추가 -->
- 
+            <p>크롤링 점검 결과[금일]</p>
+            <div id="loadHomeContent"></div>
+            <p>API 점검 결과[금일]</p>
+            <!-- <div id="displayTodaysCheckStatus"></div> -->
+            <div id="apiCheckResults"></div>
+
         </div>
 
         <div id="Intro" class="tabcontent">
@@ -63,15 +66,20 @@
             <div class="scroll-container">
                 <div id="crawling-results-intro">크롤링 데이터 결과가 여기에 표시됩니다.</div>
             </div>
-      
+        </div>   
+
         <div id="DataDetail" class="tabcontent" style="display:none;">
             <h3>데이터 상세 정보</h3>
             <p>여기에 데이터 상세 정보가 표시됩니다.</p>
             <button id="apiDetailsButton" onclick="fetchDetailedData('/api-results-detail', 'api-results-detail')">API 점검 결과 상세</button>
-            <div id="api-results-detail" class="scroll-container">API 점검 결과 세부사항이 표시됩니다.</div>
+            <div id="api-results-detail" class="scroll-container">
+                API 점검 결과 세부사항이 표시됩니다.
+            </div>
             <button id="crawlingdetailsButton" onclick="fetchDetailedData('/crawling-results-detail', 'crawling-results-detail')">크롤링 데이터 점검 결과 상세</button>
-            <div id="crawling-results-detail" class="scroll-container">크롤링 데이터 점검 결과 세부사항이 표시됩니다.</div>
-        </div>        
+            <div class="scroll-container">
+                <div id="crawling-results-detail">크롤링 데이터 점검 결과 세부사항이 표시됩니다.</div>
+            </div>  
+        </div>         
     </div>
 
     <script>

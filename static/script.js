@@ -39,65 +39,93 @@ document.addEventListener('DOMContentLoaded', function () {
             // toggleDisplay('crawling-results-detail');
         });
     }
-
+      
     function loadHomeContent() {
-        const today = new Date().toISOString().slice(0, 10); // 오늘 날짜를 YYYY-MM-DD 형식으로 변환
-        fetch(`/api-check-status?date=${today}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('서버로부터 데이터를 가져오는 데 실패했습니다.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                updateHomeTab(data); // 데이터를 기반으로 홈 탭 내용 업데이트
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('Home').innerHTML = '데이터를 불러오는 데 실패했습니다.';
-            });
+        const today = new Date().toISOString().slice(0, 10);
+        Promise.all([
+            fetch(`/crawling-results?date=${today}`).then(response => response.json()),
+            fetch(`/api-results?date=${today}`).then(response => response.json())
+        ]).then(([crawlingData, apiData]) => {
+            updateHomeTab(crawlingData); // 기존 크롤링 데이터 처리 함수 호출
+            displayApiCheckStatus(apiData); // 새로운 API 데이터 처리 함수 호출
+        }).catch(error => {
+            console.error('Error:', error);
+            document.getElementById('Home').innerHTML = '데이터를 불러오는 데 실패했습니다.';
+        });
     }
-
+    
     function updateHomeTab(data) {
-        const homeTab = document.getElementById('Home');
-        let content = '';
+        const resultsContainer = document.getElementById('loadHomeContent'); // Assuming 'loadHomeContent' is the ID where the table should be displayed
+        const today = new Date().toISOString().slice(0, 10); // Today's date in YYYY-MM-DD format
+    
+        // Deduplicating data and calculating total downloads
+        const uniqueData = [];
+        const uniqueKeys = new Set();
+        let totalDownloads = 0;
     
         data.forEach(item => {
-            // 점검 결과에 따라 클래스 이름 결정 (예: 'status-ok', 'status-error')
-            const statusClass = item.status === '정상' ? 'status-ok' : 'status-error';
-            // 항목별로 내용 추가 (예시입니다. 실제 데이터 구조에 맞게 조정해야 합니다.)
-            content += `<div class="${statusClass}">${item.checkName}: ${item.status}</div>`;
+            const key = `${item['구분']}-${item['데이터명']}-${item['사이트 주소']}`;
+            if (!uniqueKeys.has(key) && item['날짜'].slice(0, 10) === today) {
+                uniqueData.push(item);
+                uniqueKeys.add(key);
+                totalDownloads += parseInt(item['다운로드 횟수'], 10); // Summing up the download counts
+            }
         });
     
-        homeTab.innerHTML = content;
-    }
-
-    // 홈 탭에 현재 날짜 데이터 점검 결과 표시
-    function displayTodaysCheckStatus() {
-        const today = new Date().toISOString().slice(0, 10);
-        // 서버로부터 현재 날짜의 데이터 점검 상태를 가져오기 위한 요청
-        // 이 부분은 올바른 API 엔드포인트 URL로 수정해야 함
-        fetch(`/correct-api-endpoint?date=${today}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`서버 오류: 상태 코드 ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const homeTabContent = document.getElementById('Home');
-                // 데이터 점검 결과에 따라 내용 업데이트
-                // 서버 응답 구조에 따라 data.status를 적절히 수정
-                homeTabContent.innerHTML = `오늘의 데이터 점검 상태: ${data.status}`;
-            })
-            .catch(error => {
-                console.error('Error fetching today\'s check status:', error);
-                // 오류 처리 로직 추가, 예를 들어 사용자에게 오류 메시지를 표시
-                const homeTabContent = document.getElementById('Home');
-                homeTabContent.innerHTML = `데이터 점검 상태를 불러오는 데 실패했습니다.`;
+           let content = '<table border="1"><tr><th>구분</th><th>데이터명</th><th>사이트 주소</th><th>날짜</th><th>다운로드 횟수</th></tr>';
+        if (uniqueData.length > 0) {
+            uniqueData.forEach(item => {
+                content += `<tr><td>${item['구분']}</td><td>${item['데이터명']}</td><td>${item['사이트 주소']}</td><td>${item['날짜'].slice(0, 10)}</td><td>${item['다운로드 횟수']}</td></tr>`;
             });
+            // Adding total downloads row
+            content += `<tr><td colspan="4">금일 기준 총 다운로드 횟수</td><td>${totalDownloads}</td></tr>`;
+        } else {
+            content += '<tr><td colspan="5">오늘 날짜에 해당하는 데이터가 없습니다.</td></tr>';
+        }
+        content += '</table>';
+    
+        resultsContainer.innerHTML = content;
     }
 
+    function displayApiCheckStatus(apiData) {
+        const today = new Date().toISOString().slice(0, 10);
+        const apiResultsContainer = document.getElementById('apiCheckResults');
+        let content = '<h2>API 점검 결과</h2>';
+    
+                // Group data by service_name
+        const groupedByServiceName = apiData.reduce((acc, item) => {
+            if (item.check_time.slice(0, 10) === today) {
+                if (!acc[item.service_name]) {
+                    acc[item.service_name] = [];
+                }
+                acc[item.service_name].push(item);
+            }
+            return acc;
+        }, {});
+
+        // 서비스에 대해 Check_time 기준으로 최근 날짜 정렬
+        Object.keys(groupedByServiceName).forEach(serviceName => {
+            const sortedByTime = groupedByServiceName[serviceName].sort((a, b) => new Date(b.check_time) - new Date(a.check_time));
+            const mostRecent = sortedByTime[0]; // Most recent entry
+            const statusClass = mostRecent.status === '정상' ? 'status-normal' : 'status-error';
+            content += `<div class="${statusClass}">${serviceName}: 상태 - ${mostRecent.status}, 점검 시간: ${mostRecent.check_time}</div>`;
+        });
+
+        if (content === '<h2>API 점검 결과</h2>') {
+            content += '<div>오늘 날짜에 해당하는 데이터가 없습니다.</div>';
+        }
+
+        apiResultsContainer.innerHTML = content;
+    }
+
+    // 페이지 로드 시 해당 함수 호출
+    window.onload = function() {
+        loadHomeContent();
+        if (document.getElementById("defaultOpen")) {
+            document.getElementById("defaultOpen").click();
+        }
+    };
+    
     function fetchDataAndVisualize(apiEndpoint, resultContainerId) {
         fetch(apiEndpoint)
             .then(response => response.json())
@@ -282,6 +310,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         evt.currentTarget.className += " active";
     }
+
+
 
     // 이벤트 리스너를 적절한 탭 버튼에 추가
     document.addEventListener('DOMContentLoaded', function() {
